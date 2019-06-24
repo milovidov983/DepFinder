@@ -8,6 +8,7 @@ namespace DepFinder.Core.Interfaces
 {
 	public interface IProjectsRepository
 	{
-		Task<ProjectSourceCodes[]> GetSourcesAsync();
+		Task<ProjectSourceCodes[]> GetSourcesAsync<TRepository>(IRepositoryType<TRepository> repository);
+		Task<RepositoryType[]> GetRepositoriesList<RepositoryType>();
 	}
 }

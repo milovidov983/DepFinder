@@ -16,6 +16,7 @@ namespace DepFinder.Core.Models
 		{
 			public string Name { get; set; }
 			public string SourceCode { get; set; }
+			/// TODO -> TFile description { get;set;} // info about file
 		}
 	}
 }

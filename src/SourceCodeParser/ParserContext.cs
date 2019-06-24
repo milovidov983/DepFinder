@@ -7,30 +7,27 @@ namespace DepFinder.SourceCodeParser
 {
 	public class ParserContext
 	{
-		private ISourceCodeParser parseStrategy;
+		private ISourceCodeParser parser;
 
 		public ParserContext(ISourceCodeParser parseStrategy)
 		{
-			this.parseStrategy = parseStrategy;
+			this.parser = parseStrategy;
 		}
 
-		public void SetStratagy(ISourceCodeParser parseStrategy)
+		public ParserContext SetStratagy(ISourceCodeParser parseStrategy)
 		{
-			if(parseStrategy == null)
-			{
-				throw new ArgumentNullException("parseStrategy is null");
-			}
-			this.parseStrategy = parseStrategy;
+			this.parser = parseStrategy ?? throw new ArgumentNullException("parseStrategy is null");
+			return this;
 		}
 
 		public Dictionary<string, string[]> ExtractDependencies(string sourceCode)
 		{
-			return parseStrategy.ExtractDependencies(sourceCode);
+			return parser.ExtractDependencies(sourceCode);
 		}
 
 		public string ExtractProjectName(string sourceCode)
 		{
-			return parseStrategy.ExtractProjectName(sourceCode);
+			return parser.ExtractProjectName(sourceCode);
 		}
 	}
 }

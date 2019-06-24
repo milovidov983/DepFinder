@@ -10,20 +10,20 @@ using System.Threading.Tasks;
 
 namespace DepFinder.FilesRepository
 {
-	public class FilesStrategyy : IProjectsRepository
+	public class FilesStrategy : IProjectsRepository
 	{
 		private ILogger logger { get; set; }
 		private SemaphoreSlim semaphore = new SemaphoreSlim(8, 8);
 		public void SetLogger(ILogger logger) { this.logger = logger; }
 		public readonly Error error = new Error();
 
-		public FilesStrategyy(ILogger logger, int threadCount = 8)
+		public FilesStrategy(ILogger logger, string path, int threadCount = 8)
 		{
 			this.logger = logger;
 			this.semaphore = new SemaphoreSlim(threadCount, threadCount);
 		}
 
-		public Task<ProjectSourceCodes[]> GetSourcesAsync()
+		public Task<ProjectSourceCodes[]> GetSourcesAsync<TRepository>(IRepositoryType<TRepository> repository)
 		{
 			// Получить список папок
 
@@ -38,34 +38,9 @@ namespace DepFinder.FilesRepository
 			throw new NotImplementedException();
 		}
 
-		public BlockingCollection<ProjectSourceCodes> GetAsync()
+		public Task<RepositoryType[]> GetRepositoriesList<RepositoryType>()
 		{
-			var dependencyCollection = new BlockingCollection<ProjectSourceCodes>();
-
-			var repositoryList = new string[]{ };
-
-			_ = Task.Run(async () =>
-			{
-				try
-				{
-					foreach (var folder in repositoryList)
-					{
-						semaphore.Wait();
-						await Task.Run(() =>
-						{
-							object files = null;// Get(folder);
-							dependencyCollection.Add((ProjectSourceCodes)files);
-						});
-						semaphore.Release();
-					}
-				}
-				finally
-				{
-					dependencyCollection.CompleteAdding();
-				}
-			});
-
-			return dependencyCollection;
+			throw new NotImplementedException();
 		}
 	}
 }

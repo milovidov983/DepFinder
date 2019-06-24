@@ -19,7 +19,7 @@ namespace DepFinder.Core
 			/// получить все исходники
 			/// 
 
-			var projectsSources = await projectRepository.GetSourcesAsync();
+			//var projectsSources = await projectRepository.GetSourcesAsync();
 
 			/// извлеч из каждого зависимость
 			/// 
