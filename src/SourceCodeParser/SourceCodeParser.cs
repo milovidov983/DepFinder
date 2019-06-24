@@ -8,9 +8,9 @@ using System.Text.RegularExpressions;
 
 namespace ProjectParser
 {
-	public class Parser : ISourceCodeParser
+	public class SourceCodeParser : ISourceCodeParser
 	{
-		public ExternalDependency[] Parse(string sourceCode)
+		public Dictionary<string, string[]> Parse(string sourceCode)
 		{
 			var lines = SplitAndClear(sourceCode);
 			var contracts = ExtractContracts(lines);
@@ -22,18 +22,15 @@ namespace ProjectParser
 					.Where( models => models.Length > 0)
 					.SelectMany( models => models)
 					.GroupBy( model => model.ProjectName)
-					.Select( x => 
-						new ExternalDependency
-						{
-							Project = x.Key,
-							Models = x.Select(y => y.Name).ToHashSet().ToArray()
-						})
-					.ToArray();
+					.ToDictionary(
+						x=> x.Key,
+						x => x.Select(y => y.Name).ToHashSet().ToArray()
+					);
 
 				return result;
 			}
 
-			return null;
+			return new Dictionary<string, string[]>();
 		}
 
 		private Dictionary<string, string> ExtractContracts(IEnumerable<string> lines)

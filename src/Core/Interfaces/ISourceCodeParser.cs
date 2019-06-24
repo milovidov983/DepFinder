@@ -7,6 +7,14 @@ namespace DepFinder.Core.Interfaces
 {
 	public interface ISourceCodeParser
 	{
-		ExternalDependency[] Parse(string sourceCode);
+		/// <summary>
+		/// Collects dependencies in a file.
+		/// </summary>
+		/// <param name="sourceCode">Source code</param>
+		/// <returns>
+		/// Key: project name, 
+		/// Value: models
+		/// </returns>
+		Dictionary<string,string[]> Parse(string sourceCode);
 	}
 }

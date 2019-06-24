@@ -7,14 +7,14 @@ namespace DepFinder.Core.Models
 	/// <summary>
 	/// Исходные коды проекта
 	/// </summary>
-	public class ProjectSources
+	public class ProjectSourceCodes
 	{
 		public string ProjectName { get; set; }
 		public File[] Files { get; set; }
 
 		public class File
 		{
-			public string FileName { get; set; }
+			public string Name { get; set; }
 			public string SourceCode { get; set; }
 		}
 	}

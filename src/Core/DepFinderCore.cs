@@ -1,62 +1,30 @@
-﻿using System;
+﻿using DepFinder.Core.Interfaces;
+using DepFinder.Core.Models;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace DepFinder.Core
 {
 	public class DepFinderCore
 	{
-		public void Start()
+		private IProjectsRepository projectRepository { get; set; }
+		
+		private IParser parser { get; set; }
+
+		public async Task Start()
 		{
 			/// получить все исходники
 			/// 
 
-			var projectsSources = await projectRepository.GetProjects();
-
-			var projectsSources = new[] {
-				new
-				{
-					Project = "",
-					Files = new[]
-					{
-						new
-						{
-							Source = "",
-							FileName = ""
-						}
-					}
-				}
-			};
+			var projectsSources = await projectRepository.GetProjectsAsync();
 
 			/// извлеч из каждого зависимость
 			/// 
-			var dataset = new[] {
-				new {
-					ProjectName = "",
-					Dependency = new[]
-					{
-						new
-						{
-							Projects = new[]
-							{
-								new
-								{
-									Name = "P1",
-									Files = new [] { "file.1.cs", "file2.cs" },
-									Models = new[]
-											{
-												new
-												{
-													Name = "M1",
-													Files = new [] { "file.1.cs", "file2.cs" }
-												}
-											}
-								}
-							}
-						}
-					}
-				}
-			};
+
+
 			/// положить данные в базу
 			/// sleep п. 1
 
