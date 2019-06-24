@@ -12,5 +12,7 @@ namespace DepFinderTests.ParserTests
 				"ProjectA", new string[]{ "ModelA" }
 			}
 		};
+
+		public static Dictionary<string, string[]> Empty = new Dictionary<string, string[]>();
 	}
 }

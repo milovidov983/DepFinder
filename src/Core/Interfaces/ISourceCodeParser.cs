@@ -15,6 +15,7 @@ namespace DepFinder.Core.Interfaces
 		/// Key: project name, 
 		/// Value: models
 		/// </returns>
-		Dictionary<string,string[]> Parse(string sourceCode);
+		Dictionary<string,string[]> ExtractDependencies(string sourceCode);
+		string ExtractProjectName(string sourceCode);
 	}
 }

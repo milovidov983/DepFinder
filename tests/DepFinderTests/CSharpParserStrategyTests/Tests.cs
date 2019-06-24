@@ -1,19 +1,18 @@
-using ProjectParser;
 using System.Linq;
 using Xunit;
 
 namespace DepFinderTests.SourceCodeParserTests
 {
-	public class SourceCodeParserTests
+	public class Tests
 	{
 		[Fact]
 		public void FindOneDependencyInFileResultOneDependency()
 		{
 			var sourceFile = TestCases.OneDependencyInMethod;
 
-			var parser = new SourceCodeParser();
+			var parser = Create.SourceCodeParser().Build();
 
-			var results = parser.Parse(sourceFile);
+			var results = parser.ExtractDependencies(sourceFile);
 
 			Assert.True(results.Count == 1);
 			Assert.Equal("ServiceStation", results.First().Key);
@@ -25,9 +24,9 @@ namespace DepFinderTests.SourceCodeParserTests
 		{
 			var sourceFile = TestCases.TwoModelInFunctionSignature;
 
-			var parser = new SourceCodeParser();
+			var parser = Create.SourceCodeParser().Build();
 
-			var results = parser.Parse(sourceFile);
+			var results = parser.ExtractDependencies(sourceFile);
 
 			Assert.True(results.Count == 2);
 			Assert.True(results.ContainsKey("C1"));
@@ -45,9 +44,9 @@ namespace DepFinderTests.SourceCodeParserTests
 		{
 			var sourceFile = TestCases.TwoModelComments;
 
-			var parser = new SourceCodeParser();
+			var parser = Create.SourceCodeParser().Build();
 
-			var results = parser.Parse(sourceFile);
+			var results = parser.ExtractDependencies(sourceFile);
 
 			Assert.True(results.Count == 0);
 		}

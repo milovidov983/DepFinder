@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DepFinder.Parser.Models
+namespace DepFinder.CSharpStratagy.Models
 {
 	public class Model
 	{

@@ -1,10 +1,12 @@
 ﻿using DepFinder.Core.Interfaces;
 using DepFinder.Core.Models;
+using DepFinder.Infostructure;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DepFinder.Core
@@ -12,29 +14,37 @@ namespace DepFinder.Core
 	public class Parser : IParser
 	{
 		private ISourceCodeParser codeParser { get; set; }
-		public Parser(ISourceCodeParser codeParser)
+		private ILogger logger { get; set; }
+		private SemaphoreSlim semaphore = new SemaphoreSlim(8, 8);
+		public void SetLogger(ILogger logger) { this.logger = logger; }
+		public readonly Error error = new Error();
+		public Parser(ISourceCodeParser codeParser, ILogger logger, int threadCount = 8)
 		{
 			this.codeParser = codeParser;
+			this.logger = logger;
+			this.semaphore = new SemaphoreSlim(threadCount, threadCount);
 		}
 
 		public BlockingCollection<ProjectDependency> Parse(ProjectSourceCodes[] sourceCodes)
 		{
-
 			var dependencyCollection = new BlockingCollection<ProjectDependency>();
 
-			_ = Task.Run(() =>
+			_ = Task.Run(async () =>
 			{
 				try
 				{
 					foreach (var sourceCode in sourceCodes)
 					{
-						var dependencies = Parse(sourceCode);
-						if (dependencies?.Dependencies?.Count > 0)
+						semaphore.Wait();
+						await Task.Run(() =>
 						{
-							dependencyCollection.Add(Parse(sourceCode));
-						}
+							var dependencies = Parse(sourceCode);
+							dependencyCollection.Add(dependencies);
+						});
+						semaphore.Release();
 					}
-				} finally
+				}
+				finally
 				{
 					dependencyCollection.CompleteAdding();
 				}
@@ -45,58 +55,69 @@ namespace DepFinder.Core
 		}
 		private ProjectDependency Parse(ProjectSourceCodes sourceCode)
 		{
-
 			var projectDependency = new ProjectDependency
 			{
 				ProjectName = sourceCode.ProjectName
 			};
-
-			var dependencies = projectDependency.Dependencies = new Dictionary<string, Dictionary<string, HashSet<string>>>();
-			var allFiles = sourceCode?.Files ?? new ProjectSourceCodes.File[] { };
-			foreach (var file in allFiles)
+			ProjectSourceCodes.File currentFile = null;
+			try
 			{
-				var projectsModels = codeParser.Parse(file.SourceCode);
-
-				foreach (var projectModels in projectsModels)
+				var dependencies = projectDependency.Dependencies = new Dictionary<string, Dictionary<string, HashSet<string>>>();
+				var allFiles = sourceCode?.Files ?? new ProjectSourceCodes.File[] { };
+				foreach (var file in allFiles)
 				{
-					var projectName = projectModels.Key;
-					var models = projectModels.Value;
+					currentFile = file;
+					var projectsModels = codeParser.ExtractDependencies(file.SourceCode);
 
-					if (dependencies.TryAdd(projectName, null))
+					foreach (var projectModels in projectsModels)
 					{
-						var files = new HashSet<string>
+						var projectName = projectModels.Key;
+						var models = projectModels.Value;
+
+						if (dependencies.TryAdd(projectName, null))
+						{
+							var files = new HashSet<string>
 						{
 							file.Name
 						};
 
-						dependencies[projectName] = models.ToDictionary(
-							x => x,
-							x => files
-						);
-					}
-					else
-					{
-						var currentProject = dependencies[projectName];
-						foreach (var model in models)
+							dependencies[projectName] = models.ToDictionary(
+								x => x,
+								x => files
+							);
+						}
+						else
 						{
-							if (currentProject.ContainsKey(model))
+							var currentProject = dependencies[projectName];
+							foreach (var model in models)
 							{
-								currentProject[model].Add(file.Name);
-							}
-							else
-							{
-								var files = new HashSet<string>
+								if (currentProject.ContainsKey(model))
+								{
+									currentProject[model].Add(file.Name);
+								}
+								else
+								{
+									var files = new HashSet<string>
 								{
 									file.Name
 								};
-								currentProject.Add(model, files);
+									currentProject.Add(model, files);
+								}
 							}
-						}
 
+						}
 					}
 				}
+			} catch(Exception e)
+			{
+				error.Status = CodeErrors.HasError;
+				error.Class = $"{nameof(Parser)}";
+				error.Method = $"{nameof(Parse)}({nameof(ProjectSourceCodes)} sourceCode)";
+
+				logger.Error(e, $"Parsing error in file [{currentFile?.Name}]!");
 			}
 			return projectDependency;
+
 		}
 	}
 }

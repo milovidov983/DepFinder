@@ -34,20 +34,24 @@ namespace DepFinderTests.ParserTests
 						}
 					}
 		};
-		public static ProjectSourceCodes[] Full = new ProjectSourceCodes[]
+
+		public static ProjectSourceCodes[] NotEmpty = new ProjectSourceCodes[]
 		{
-					new ProjectSourceCodes
+			new ProjectSourceCodes
+			{
+				Files = new ProjectSourceCodes.File[]
+				{
+					new ProjectSourceCodes.File
 					{
-						ProjectName = "SpecialName",
-						Files = new ProjectSourceCodes.File[]
-						{
-							new ProjectSourceCodes.File
-							{
-								Name = "somefile1.cs",
-								SourceCode = "... source code ..."
-							}
-						}
+						Name = ""
 					}
+				}
+			}
 		};
+		public static ProjectSourceCodes[] Empty = new ProjectSourceCodes[]
+{
+
+};
+
 	}
 }

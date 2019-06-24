@@ -1,36 +1,62 @@
 ﻿using DepFinder.Core.Interfaces;
 using DepFinder.Core.Models;
-using DepFinder.Parser.Models;
+using DepFinder.CSharpStratagy.Models;
+using DepFinder.Infostructure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace ProjectParser
+namespace DepFinder.CSharpStratagy
 {
-	public class SourceCodeParser : ISourceCodeParser
+	public class CSharpParserStrategy : ISourceCodeParser
 	{
-		public Dictionary<string, string[]> Parse(string sourceCode)
+		private ILogger logger;
+		public readonly Error error = new Error();
+
+		public CSharpParserStrategy(ILogger logger)
 		{
-			var lines = SplitAndClear(sourceCode);
-			var contracts = ExtractContracts(lines);
+			this.logger = logger;
+		}
+		
 
-			if (contracts.Count > 0)
+		public Dictionary<string, string[]> ExtractDependencies(string sourceCode)
+		{
+			try
 			{
-				var result = lines
-					.Select( line => GetModels(line, contracts))
-					.Where( models => models.Length > 0)
-					.SelectMany( models => models)
-					.GroupBy( model => model.ProjectName)
-					.ToDictionary(
-						x=> x.Key,
-						x => x.Select(y => y.Name).ToHashSet().ToArray()
-					);
+				var lines = SplitAndClear(sourceCode);
+				var contracts = ExtractContracts(lines);
 
-				return result;
+				if (contracts.Count > 0)
+				{
+					var result = lines
+						.Select(line => GetModels(line, contracts))
+						.Where(models => models.Length > 0)
+						.SelectMany(models => models)
+						.GroupBy(model => model.ProjectName)
+						.ToDictionary(
+							x => x.Key,
+							x => x.Select(y => y.Name).ToHashSet().ToArray()
+						);
+
+					return result;
+				}
+
+				
+			} catch(Exception e)
+			{
+				error.Status = CodeErrors.HasError;
+				error.Class = $"{nameof(CSharpParserStrategy)}";
+				error.Method = $"{nameof(ExtractDependencies)}(string sourceCode)";
+
+				logger.Error(e, "Parsing error!");
 			}
-
 			return new Dictionary<string, string[]>();
+		}
+
+		public string ExtractProjectName(string sourceCode)
+		{
+			return "";
 		}
 
 		private Dictionary<string, string> ExtractContracts(IEnumerable<string> lines)

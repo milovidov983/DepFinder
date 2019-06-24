@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace DepFinder.Parser.Models
+namespace DepFinder.CSharpStratagy.Models
 {
 	public class Eject
 	{
