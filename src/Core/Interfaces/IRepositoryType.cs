@@ -4,9 +4,9 @@ using System.Text;
 
 namespace DepFinder.Core.Interfaces
 {
-	public interface IRepositoryType<TRepository>
+	public interface IRepositoryData
 	{
 		string Name { get; set; }
-		TRepository Data { get; set; }
+		string Path { get; set; }
 	}
 }

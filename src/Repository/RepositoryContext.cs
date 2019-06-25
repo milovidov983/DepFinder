@@ -1,6 +1,6 @@
 ﻿using DepFinder.Core.Interfaces;
 using DepFinder.Core.Models;
-using DepFinder.Infostructure;
+using DepFinder.Infrastructure;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -31,11 +31,11 @@ namespace DepFinder.Repository
 			return this;
 		}
 
-		public async Task<BlockingCollection<ProjectSourceCodes[]>> GetAsync<RepositoryType>()
+		public async Task<BlockingCollection<ProjectSourceCodes[]>> GetAsync()
 		{
 			var sources = new BlockingCollection<ProjectSourceCodes[]>();
 
-			var repositoryList = await repository.GetRepositoriesList<IRepositoryType<RepositoryType>>();
+			var repositoryList = await repository.GetRepositoriesList();
 			_ = Task.Run(async () =>
 			{
 				try
@@ -45,7 +45,7 @@ namespace DepFinder.Repository
 						semaphore.Wait();
 						await Task.Run(async () =>
 						{
-							var files = await this.repository.GetSourcesAsync(repository);
+							var files = await GetSourceCodesAsync(repository);
 							sources.Add(files);
 						});
 						semaphore.Release();
@@ -60,7 +60,7 @@ namespace DepFinder.Repository
 			return sources;
 		}
 
-		private async Task<ProjectSourceCodes[]> GetSourceCodes<RepositoryType>(IRepositoryType<RepositoryType> repository)
+		private async Task<ProjectSourceCodes[]> GetSourceCodesAsync(IRepositoryData repository)
 		{
 			try
 			{
@@ -69,7 +69,7 @@ namespace DepFinder.Repository
 			{
 				error.Status = CodeErrors.HasError;
 				error.Class = $"{nameof(RepositoryContext)}";
-				error.Method = $"{nameof(GetSourceCodes)}({nameof(RepositoryType)} repository)";
+				error.Method = $"{nameof(GetSourceCodesAsync)}({nameof(IRepositoryData)} repository)";
 
 				logger.Error(e, $"GetSourceCodes error in repository [{repository?.Name}]!");
 			}

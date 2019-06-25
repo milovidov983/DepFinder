@@ -1,31 +1,48 @@
 ﻿using DepFinder.Core.Interfaces;
 using DepFinder.Core.Models;
-using DepFinder.Infostructure;
+using DepFinder.Repository.FileStratagy;
 using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
-namespace DepFinder.FilesRepository
+namespace DepFinder.FilesRepository.FileStratagy
 {
 	public class FilesStrategy : IProjectsRepository
 	{
-		private ILogger logger { get; set; }
-		private SemaphoreSlim semaphore = new SemaphoreSlim(8, 8);
-		public void SetLogger(ILogger logger) { this.logger = logger; }
-		public readonly Error error = new Error();
+		private string path;
 
-		public FilesStrategy(ILogger logger, string path, int threadCount = 8)
+		public FilesStrategy(string path)
 		{
-			this.logger = logger;
-			this.semaphore = new SemaphoreSlim(threadCount, threadCount);
+			this.path = path;
 		}
 
-		public Task<ProjectSourceCodes[]> GetSourcesAsync<TRepository>(IRepositoryType<TRepository> repository)
+		public Task<IRepositoryData[]> GetRepositoriesList()
+		{
+			if(!Directory.Exists(path))
+			{
+				throw new ArgumentException($"Path do not exsists! [{path}]");
+			}
+
+			var dirs = Directory.GetDirectories(path).Select(x =>
+			{
+				IRepositoryData data = new FileSystemRepository
+				{
+					Name = x,
+					Path = x
+				};
+				return data;
+			}
+			).ToArray();
+
+			
+			return Task.Run(() => dirs);
+		}
+
+		public async Task<ProjectSourceCodes[]> GetSourcesAsync(IRepositoryData repository)
 		{
 			// Получить список папок
+
 
 			// Войти в первую папку и рекурсивно считать все файлы с их полными путями
 
@@ -35,11 +52,6 @@ namespace DepFinder.FilesRepository
 
 			// вернуть блокинг колекшн
 
-			throw new NotImplementedException();
-		}
-
-		public Task<RepositoryType[]> GetRepositoriesList<RepositoryType>()
-		{
 			throw new NotImplementedException();
 		}
 	}
