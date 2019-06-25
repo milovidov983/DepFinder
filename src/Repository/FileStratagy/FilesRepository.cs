@@ -2,8 +2,11 @@
 using DepFinder.Core.Models;
 using DepFinder.Repository.FileStratagy;
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace DepFinder.FilesRepository.FileStratagy
@@ -21,7 +24,7 @@ namespace DepFinder.FilesRepository.FileStratagy
 		{
 			if(!Directory.Exists(path))
 			{
-				throw new ArgumentException($"Path do not exsists! [{path}]");
+				throw new InvalidOperationException($"Path do not exsists! [{path}]");
 			}
 
 			var dirs = Directory.GetDirectories(path).Select(x =>
@@ -39,20 +42,53 @@ namespace DepFinder.FilesRepository.FileStratagy
 			return Task.Run(() => dirs);
 		}
 
-		public async Task<ProjectSourceCodes[]> GetSourcesAsync(IRepositoryData repository)
+		public async Task<ProjectSourceCodes> GetSourcesAsync(IRepositoryData repository)
 		{
-			// Получить список папок
+			var files = (await GetFiles(repository.Path)).Select(x =>
+				   new ProjectSourceCodes.File
+				   {
+					   Name = x.Name,
+					   SourceCode = x.Data
+				   }
+				).ToArray();
 
+			var project = new ProjectSourceCodes
+			{
+				Files = files
+			};
 
-			// Войти в первую папку и рекурсивно считать все файлы с их полными путями
+			project.ProjectName = projectName;
 
-			// положить результат в блокингКоллекшн
+			return project;
+		}
+		
+		private List<(string Name, string Data)> files = new List<(string Name, string Data)>();
+		private string projectName = string.Empty;
+		private readonly Regex ProjectNamePattern = new Regex(@"(\w{1,})[.]Contracts", RegexOptions.Compiled);
+		private const int serviceNameGroupIndex = 1;
+		/// <summary>
+		/// A side effect function is trying to find a project name using folder names.
+		/// </summary>
+		private async Task<List<(string Name, string Data)>> GetFiles(string currentFolder)
+		{
+			
+			foreach (string fileName in Directory.EnumerateFiles(currentFolder, "*.cs"))
+			{
+				var sourceCode = await File.ReadAllTextAsync(fileName);
 
-			// 4 потока
+				files.Add((Name: fileName, Data: sourceCode));
+			}
+			foreach (string name in Directory.EnumerateDirectories(currentFolder))
+			{
+				var macth = ProjectNamePattern.Match(name);
+				if (macth.Success)
+				{
+					projectName = macth.Groups[serviceNameGroupIndex].Value;
+				}
 
-			// вернуть блокинг колекшн
-
-			throw new NotImplementedException();
+				return await GetFiles(name);
+			}
+			return files;
 		}
 	}
 }

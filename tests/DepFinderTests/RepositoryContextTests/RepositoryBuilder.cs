@@ -11,7 +11,7 @@ namespace DepFinderTests.RepositoryContextTests
 	{
 		private Task<IRepositoryData[]> repositoryList;
 		private Exception resultException;
-		private Task<ProjectSourceCodes[]> normalResults;
+		private Task<ProjectSourceCodes> normalResults;
 		private Mock<IProjectsRepository> repository;
 
 		public RepositoryBuilder()
@@ -36,7 +36,7 @@ namespace DepFinderTests.RepositoryContextTests
 
 			return this;
 		}
-		public RepositoryBuilder SetGetSourcesAsyncResult(Task<ProjectSourceCodes[]> projectSources)
+		public RepositoryBuilder SetGetSourcesAsyncResult(Task<ProjectSourceCodes> projectSources)
 		{
 			if (resultException != null)
 			{

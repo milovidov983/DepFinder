@@ -31,9 +31,9 @@ namespace DepFinder.Repository
 			return this;
 		}
 
-		public async Task<BlockingCollection<ProjectSourceCodes[]>> GetAsync()
+		public async Task<BlockingCollection<ProjectSourceCodes>> GetAsync()
 		{
-			var sources = new BlockingCollection<ProjectSourceCodes[]>();
+			var sources = new BlockingCollection<ProjectSourceCodes>();
 
 			var repositoryList = await repository.GetRepositoriesList();
 			_ = Task.Run(async () =>
@@ -60,7 +60,7 @@ namespace DepFinder.Repository
 			return sources;
 		}
 
-		private async Task<ProjectSourceCodes[]> GetSourceCodesAsync(IRepositoryData repository)
+		private async Task<ProjectSourceCodes> GetSourceCodesAsync(IRepositoryData repository)
 		{
 			try
 			{
@@ -73,7 +73,7 @@ namespace DepFinder.Repository
 
 				logger.Error(e, $"GetSourceCodes error in repository [{repository?.Name}]!");
 			}
-			return new ProjectSourceCodes[] { };
+			return new ProjectSourceCodes { };
 		}
 	}
 }

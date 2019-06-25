@@ -5,7 +5,7 @@ using System.Text;
 
 namespace DepFinder.SourceCodeParser
 {
-	public class ParserContext
+	public class ParserContext : ISourceCodeParser
 	{
 		private ISourceCodeParser parser;
 

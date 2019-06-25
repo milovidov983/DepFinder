@@ -21,7 +21,7 @@ namespace DepFinderTests.RepositoryContextTests
 			var context = Create.Repository()
 				.SetSpecialRepository(repos)
 				.SetRepositoryList(RepositoryLists.OneFileSystemEmptyElement)
-				.SetGetSourcesAsyncResult(Task.Run(() => new ProjectSourceCodes[] { }))
+				.SetGetSourcesAsyncResult(Task.Run(() => new ProjectSourceCodes { }))
 				.Build();
 
 			var collection = context.GetAsync();
