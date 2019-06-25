@@ -1,6 +1,6 @@
 ﻿using DepFinder.Core.Interfaces;
 using DepFinder.Core.Models;
-using DepFinder.Infostructure;
+using DepFinder.Infrastructure;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;

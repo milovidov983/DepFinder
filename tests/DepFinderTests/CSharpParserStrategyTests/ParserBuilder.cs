@@ -1,5 +1,5 @@
 ﻿using DepFinder.CSharpStratagy;
-using DepFinder.Infostructure;
+using DepFinder.Infrastructure;
 using Moq;
 using System;
 using System.Collections.Generic;

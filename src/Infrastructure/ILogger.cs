@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DepFinder.Infostructure
+namespace DepFinder.Infrastructure
 {
 	public interface ILogger
 	{

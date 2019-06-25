@@ -1,6 +1,6 @@
 ﻿using DepFinder.Core;
 using DepFinder.Core.Models;
-using DepFinder.Infostructure;
+using DepFinder.Infrastructure;
 using Moq;
 using System;
 using System.Collections.Concurrent;

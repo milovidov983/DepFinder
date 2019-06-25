@@ -1,7 +1,7 @@
 ﻿using DepFinder.Core.Interfaces;
 using DepFinder.Core.Models;
 using DepFinder.CSharpStratagy.Models;
-using DepFinder.Infostructure;
+using DepFinder.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
